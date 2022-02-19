@@ -19,37 +19,49 @@ func (bt *BinaryTree) Add(v int) {
 	node := Node{Value: v}
 	if bt.Root == nil {
 		bt.Root = &node
-		node.Left = nil
-		node.Right = nil
 		return
-	} else {
-		bt.Root.Insert(v)
 	}
+	bt.Root.Insert(node)
 }
 
-func (n *Node) Insert(v int) {
-	node := Node{Value: v}
-	if v <= n.Value {
+func (n *Node) Insert(node Node) {
+	if node.Value <= n.Value {
 		if n.Left == nil {
 			n.Left = &node
-			node.Left = nil
-			node.Right = nil
-		} else {
-			n.Left.Insert(v)
+			return
 		}
-	} else {
-		if n.Right == nil {
-			n.Right = &node
-			node.Left = nil
-			node.Right = nil
-		} else {
-			n.Right.Insert(v)
-		}
+		n.Left.Insert(node)
+		return
 	}
+	if n.Right == nil {
+		n.Right = &node
+		return
+	}
+	n.Right.Insert(node)
 }
 
 func (n Node) String() string {
 	return fmt.Sprintf("%v", n.Value)
+}
+
+func (n Node) Strings() string {
+	var msg string
+	if n.Left != nil {
+		msg = n.Left.Strings() + ","
+	}
+
+	msg += strconv.Itoa(n.Value)
+	if n.Right != nil {
+		msg += "," + n.Right.Strings()
+	}
+	return msg
+}
+
+func (bt BinaryTree) Strings() string {
+	if bt.Root == nil {
+		return "nil"
+	}
+	return bt.Root.Strings()
 }
 
 func (bt *BinaryTree) Path(v int) string {
@@ -64,18 +76,17 @@ func (bt *BinaryTree) Path(v int) string {
 		if v < curr.Value {
 			msg += "L"
 			next = curr.Left
-		} else if v > curr.Value {
+			continue
+		}
+		if v > curr.Value {
 			msg += "R"
 			next = curr.Right
 		}
 	}
 	if curr == nil {
-		msg = "{Value not found"
-	} else {
-		msg += ", " + curr.String()
+		return "{Value not found}"
 	}
-	msg += "}"
-	return msg
+	return msg + ", " + curr.String() + "}"
 }
 
 func (bt *BinaryTree) Max() string {
@@ -85,8 +96,7 @@ func (bt *BinaryTree) Max() string {
 			msg += curr.String()
 		}
 	}
-	msg += "}"
-	return msg
+	return msg + "}"
 }
 
 func (bt *BinaryTree) Min() string {
@@ -96,29 +106,23 @@ func (bt *BinaryTree) Min() string {
 			msg += curr.String()
 		}
 	}
-	msg += "}"
-	return msg
+	return msg + "}"
 }
 
 func (n *Node) Reverse() {
 	if n == nil {
 		return
-	} else {
-		n.Left.Reverse()
-		n.Right.Reverse()
-
-		temp := n.Left
-		n.Left = n.Right
-		n.Right = temp
 	}
+	n.Left.Reverse()
+	n.Right.Reverse()
+	n.Left, n.Right = n.Right, n.Left
 }
 
 func (n *Node) Size() int {
 	if n == nil {
 		return 0
-	} else {
-		return (n.Left.Size() + n.Right.Size() + 1)
 	}
+	return n.Left.Size() + n.Right.Size() + 1
 }
 
 func (bt *BinaryTree) Size() string {
@@ -129,16 +133,14 @@ func (bt *BinaryTree) Size() string {
 func (n *Node) MaxDepth() int {
 	if n == nil {
 		return 0
-	} else {
-		left := n.Left.MaxDepth() + 1
-		right := n.Right.MaxDepth() + 1
-
-		if left > right {
-			return left
-		} else {
-			return right
-		}
 	}
+	left := n.Left.MaxDepth() + 1
+	right := n.Right.MaxDepth() + 1
+
+	if left > right {
+		return left
+	}
+	return right
 }
 
 func (bt *BinaryTree) MaxDepth() string {
