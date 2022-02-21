@@ -1,7 +1,6 @@
 package binarytree
 
 import (
-	"fmt"
 	"strconv"
 )
 
@@ -41,27 +40,23 @@ func (n *Node) Insert(node Node) {
 }
 
 func (n Node) String() string {
-	return fmt.Sprintf("%v", n.Value)
-}
-
-func (n Node) Strings() string {
 	var msg string
 	if n.Left != nil {
-		msg = n.Left.Strings() + ","
+		msg = n.Left.String() + ","
 	}
 
 	msg += strconv.Itoa(n.Value)
 	if n.Right != nil {
-		msg += "," + n.Right.Strings()
+		msg += "," + n.Right.String()
 	}
 	return msg
 }
 
-func (bt BinaryTree) Strings() string {
+func (bt BinaryTree) String() string {
 	if bt.Root == nil {
 		return "nil"
 	}
-	return bt.Root.Strings()
+	return bt.Root.String()
 }
 
 func (bt *BinaryTree) Path(v int) string {

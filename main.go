@@ -16,7 +16,7 @@ func main() {
 	bt.Add(15)
 	bt.Add(3)
 
-	fmt.Println(bt.Strings())
+	fmt.Println(bt.String())
 
 	fmt.Println(bt.Path(3))
 	fmt.Println(bt.Path(18))
