@@ -1,6 +1,9 @@
 package binarytree
 
 import (
+	"encoding/json"
+	"fmt"
+	"net/http"
 	"strconv"
 )
 
@@ -14,11 +17,11 @@ type BinaryTree struct {
 	Root *Node
 }
 
-func (bt *BinaryTree) Add(v int) {
+func (bt *BinaryTree) Add(v int) error {
 	node := Node{Value: v}
 	if bt.Root == nil {
 		bt.Root = &node
-		return
+		return nil
 	}
 	bt.Root.Insert(node)
 }
@@ -141,4 +144,49 @@ func (n *Node) MaxDepth() int {
 func (bt *BinaryTree) MaxDepth() string {
 	s := bt.Root.MaxDepth()
 	return "{Max depth = " + strconv.Itoa(s) + "}"
+}
+
+type Collection interface {
+	Add(v int) error
+	Path(v int) string
+	MaxDepth() string
+	Size() string
+}
+
+func (q *APIQueue) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	switch r.URL.Path {
+	case "/add":
+		//Changed so all values added are strings
+		v := r.URL.Query().Get("value")
+		if err := q.Store.Add(v); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]interface{}{"value added": v})
+	case "/get":
+		idx, err := strconv.Atoi(r.URL.Query().Get("index"))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		v, err := q.Store.Read(idx)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]interface{}{"value": v.Value})
+	case "/listAll":
+		msg := q.Store.String()
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]interface{}{"list": msg})
+	case "/reverse":
+		q.Store.Reverse()
+		msg := q.Store.String()
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]interface{}{"list reversed": msg})
+	default:
+		http.Error(w, fmt.Sprintf("path %v undefined", r.URL.Path), http.StatusBadRequest)
+	}
 }
