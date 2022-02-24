@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"net/http"
 
 	"github.com/matt-d-nelson/binarytree/binarytree"
 )
@@ -16,17 +16,8 @@ func main() {
 	bt.Add(15)
 	bt.Add(3)
 
-	fmt.Println(bt.String())
-
-	fmt.Println(bt.Path(3))
-	fmt.Println(bt.Path(18))
-
-	bt.Root.Reverse()
-	fmt.Println(bt.Path(3))
-
-	bt.Root.Reverse()
-	fmt.Println(bt.Path(3))
-	fmt.Println(bt.Size())
-	fmt.Println(bt.Max())
-	fmt.Println(bt.MaxDepth())
+	api := &binarytree.APIQueue{
+		Store: &bt,
+	}
+	http.ListenAndServe(":8080", api)
 }
