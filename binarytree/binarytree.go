@@ -193,7 +193,7 @@ func (q *APIQueue) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]interface{}{"max": msg})
 	case "/min":
-		msg := q.Store.Min()
+		msg := q.Store.Min() //Similar issue to max
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]interface{}{"min": msg})
 	case "/size":
