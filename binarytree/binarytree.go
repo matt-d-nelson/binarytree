@@ -147,6 +147,25 @@ func (bt *BinaryTree) MaxDepth() string {
 	return "{Max depth = " + strconv.Itoa(s) + "}"
 }
 
+func (n *Node) Index(parIndex int, i int) int {
+	index := n.Left.Size() + parIndex + 1
+	if index == i {
+		return n.Value
+	}
+	if index > i {
+		return n.Left.Index(parIndex, i)
+	}
+	return n.Right.Index(index, i)
+	//return -1
+}
+
+func (bt *BinaryTree) Index(i int) int {
+	if bt.Root != nil {
+		return bt.Root.Index(-1, i)
+	}
+	return -1
+}
+
 type Collection interface {
 	Add(v int) error
 	String() string
