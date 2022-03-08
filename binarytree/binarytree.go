@@ -159,21 +159,21 @@ func (n *Node) Index(parIndex int, i int) int {
 	//return -1
 }
 
-func (bt *BinaryTree) Index(i int) int {
+func (bt *BinaryTree) Index(i int) (int, error) {
 	if bt.Root != nil {
-		return bt.Root.Index(-1, i)
+		return bt.Root.Index(-1, i), nil
 	}
-	return -1
+	return -1, fmt.Errorf("index %d is out of bounds", i)
 }
 
 type Collection interface {
 	Add(v int) error
 	String() string
-	//Path(v int) string
-	//Max() string
-	//Min() string
-	//Size() string
-	//MaxDepth() string
+	Path(v int) string
+	Max() string
+	Min() string
+	Size() string
+	MaxDepth() string
 }
 
 type APIQueue struct {
@@ -194,35 +194,35 @@ func (q *APIQueue) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]interface{}{"value added": v})
-	// case "/path":
-	// 	v, err := strconv.Atoi(r.URL.Query().Get("value"))
-	// 	if err != nil {
-	// 		http.Error(w, err.Error(), http.StatusBadRequest)
-	// 		return
-	// 	}
-	// 	msg := q.Store.Path(v)
-	// 	w.WriteHeader(http.StatusOK)
-	// 	json.NewEncoder(w).Encode(map[string]interface{}{"value added": msg})
+	case "/path":
+		v, err := strconv.Atoi(r.URL.Query().Get("value"))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		msg := q.Store.Path(v)
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]interface{}{"value added": msg})
 	case "/listAll":
 		msg := q.Store.String()
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]interface{}{"list": msg})
-	// case "/max": //Listing 15 and 17/ Altered node.string method called within max method
-	// 	msg := q.Store.Max()
-	// 	w.WriteHeader(http.StatusOK)
-	// 	json.NewEncoder(w).Encode(map[string]interface{}{"max": msg})
-	// case "/min":
-	// 	msg := q.Store.Min() //Similar issue to max
-	// 	w.WriteHeader(http.StatusOK)
-	// 	json.NewEncoder(w).Encode(map[string]interface{}{"min": msg})
-	// case "/size":
-	// 	msg := q.Store.Size()
-	// 	w.WriteHeader(http.StatusOK)
-	// 	json.NewEncoder(w).Encode(map[string]interface{}{"size": msg})
-	// case "/maxDepth":
-	// 	msg := q.Store.MaxDepth()
-	// 	w.WriteHeader(http.StatusOK)
-	// 	json.NewEncoder(w).Encode(map[string]interface{}{"max depth": msg})
+	case "/max": //Listing 15 and 17/ Altered node.string method called within max method
+		msg := q.Store.Max()
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]interface{}{"max": msg})
+	case "/min":
+		msg := q.Store.Min() //Similar issue to max
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]interface{}{"min": msg})
+	case "/size":
+		msg := q.Store.Size()
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]interface{}{"size": msg})
+	case "/maxDepth":
+		msg := q.Store.MaxDepth()
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]interface{}{"max depth": msg})
 
 	default:
 		http.Error(w, fmt.Sprintf("path %v undefined", r.URL.Path), http.StatusBadRequest)
