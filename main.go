@@ -1,8 +1,6 @@
 package main
 
 import (
-	"net/http"
-
 	"github.com/matt-d-nelson/binarytree/binarytree"
 )
 
@@ -15,9 +13,4 @@ func main() {
 	bt.Add(17)
 	bt.Add(15)
 	bt.Add(3)
-
-	api := &binarytree.APIQueue{
-		Store: &bt,
-	}
-	http.ListenAndServe(":8080", api)
 }

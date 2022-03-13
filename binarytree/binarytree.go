@@ -1,11 +1,10 @@
 package binarytree
 
 import (
-	"encoding/json"
-	"fmt"
-	"net/http"
 	"strconv"
 )
+
+//-----------------------------OBJECTS-----------------------------//
 
 type Node struct {
 	Value int
@@ -16,6 +15,8 @@ type Node struct {
 type BinaryTree struct {
 	Root *Node
 }
+
+//-----------------------------ADD-----------------------------//
 
 func (bt *BinaryTree) Add(v int) error {
 	node := Node{Value: v}
@@ -43,6 +44,8 @@ func (n *Node) Insert(node Node) {
 	n.Right.Insert(node)
 }
 
+//-----------------------------STRING-----------------------------//
+
 func (n Node) String() string {
 	var msg string
 	if n.Left != nil {
@@ -62,6 +65,8 @@ func (bt BinaryTree) String() string {
 	}
 	return bt.Root.String()
 }
+
+//-----------------------------PATH-----------------------------//
 
 func (bt *BinaryTree) Path(v int) string {
 	msg := "{"
@@ -88,6 +93,8 @@ func (bt *BinaryTree) Path(v int) string {
 	return msg + ", " + curr.String() + "}"
 }
 
+//-----------------------------MAX/MIN-----------------------------//
+
 func (bt *BinaryTree) Max() string {
 	msg := "{"
 	for curr := bt.Root; curr != nil; curr = curr.Right {
@@ -108,6 +115,8 @@ func (bt *BinaryTree) Min() string {
 	return msg + "}"
 }
 
+//-----------------------------REVERSE-----------------------------//
+
 func (n *Node) Reverse() {
 	if n == nil {
 		return
@@ -116,6 +125,8 @@ func (n *Node) Reverse() {
 	n.Right.Reverse()
 	n.Left, n.Right = n.Right, n.Left
 }
+
+//-----------------------------SIZE-----------------------------//
 
 func (n *Node) Size() int {
 	if n == nil {
@@ -128,6 +139,8 @@ func (bt *BinaryTree) Size() string {
 	s := bt.Root.Size()
 	return "{Size = " + strconv.Itoa(s) + "}"
 }
+
+//-----------------------------MAX DEPTH-----------------------------//
 
 func (n *Node) MaxDepth() int {
 	if n == nil {
@@ -147,6 +160,8 @@ func (bt *BinaryTree) MaxDepth() string {
 	return "{Max depth = " + strconv.Itoa(s) + "}"
 }
 
+//-----------------------------INDEX-----------------------------//
+
 func (n *Node) Index(parIndex int, i int) int {
 	index := n.Left.Size() + parIndex + 1
 	if index == i {
@@ -163,67 +178,4 @@ func (bt *BinaryTree) Index(i int) (int, error) {
 		return bt.Root.Index(-1, i), nil
 	}
 	return -1, nil
-}
-
-type Collection interface {
-	Add(v int) error
-	String() string
-	Path(v int) string
-	Max() string
-	Min() string
-	Size() string
-	MaxDepth() string
-}
-
-type APIQueue struct {
-	Store Collection
-}
-
-func (q *APIQueue) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	switch r.URL.Path {
-	case "/add":
-		v, err := strconv.Atoi(r.URL.Query().Get("value"))
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		if err := q.Store.Add(v); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]interface{}{"value added": v})
-	case "/path":
-		v, err := strconv.Atoi(r.URL.Query().Get("value"))
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		msg := q.Store.Path(v)
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]interface{}{"value added": msg})
-	case "/listAll":
-		msg := q.Store.String()
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]interface{}{"list": msg})
-	case "/max": //Listing 15 and 17/ Altered node.string method called within max method
-		msg := q.Store.Max()
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]interface{}{"max": msg})
-	case "/min":
-		msg := q.Store.Min() //Similar issue to max
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]interface{}{"min": msg})
-	case "/size":
-		msg := q.Store.Size()
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]interface{}{"size": msg})
-	case "/maxDepth":
-		msg := q.Store.MaxDepth()
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]interface{}{"max depth": msg})
-
-	default:
-		http.Error(w, fmt.Sprintf("path %v undefined", r.URL.Path), http.StatusBadRequest)
-	}
 }
