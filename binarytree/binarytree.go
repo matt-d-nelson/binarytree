@@ -156,14 +156,13 @@ func (n *Node) Index(parIndex int, i int) int {
 		return n.Left.Index(parIndex, i)
 	}
 	return n.Right.Index(index, i)
-	//return -1
 }
 
 func (bt *BinaryTree) Index(i int) (int, error) {
 	if bt.Root != nil {
 		return bt.Root.Index(-1, i), nil
 	}
-	return -1, fmt.Errorf("index %d is out of bounds", i)
+	return -1, nil
 }
 
 type Collection interface {
